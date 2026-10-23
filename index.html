@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asesmen Sumatif Lingkaran — Matematika SMP Kelas 9E</title>
+<style>
+  :root{
+    --hijau-tua:#14532d; --hijau:#16a34a; --hijau-muda:#4ade80; --kuning:#facc15;
+    --merah:#dc2626; --abu:#f3f4f6; --abu2:#e5e7eb; --teks:#1f2937; --teks-lembut:#6b7280;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif; background:var(--abu); color:var(--teks)}
+  .wrap{max-width:880px; margin:0 auto; padding:16px}
+  header.app{background:var(--hijau-tua); color:#fff; border-radius:0 0 18px 18px; padding:18px 16px; text-align:center}
+  header.app h1{margin:0; font-size:1.35rem}
+  header.app p{margin:4px 0 0; opacity:.9; font-size:.95rem}
+  .badge{display:inline-block; background:var(--kuning); color:#422006; font-weight:700; border-radius:999px; padding:2px 12px; font-size:.8rem; margin-top:8px}
+  .card{background:#fff; border-radius:var(--radius); box-shadow:0 2px 10px rgba(0,0,0,.06); padding:20px; margin-top:16px}
+  label{font-weight:600; display:block; margin:12px 0 6px}
+  input[type=text],input[type=password],textarea,select{
+    width:100%; padding:12px; border:2px solid var(--abu2); border-radius:10px; font-size:1rem; font-family:inherit; background:#fff}
+  input:focus,textarea:focus{outline:none; border-color:var(--hijau)}
+  .btn{display:inline-block; border:none; cursor:pointer; font-weight:700; border-radius:10px; padding:12px 22px; font-size:1rem; font-family:inherit}
+  .btn-utama{background:var(--hijau-tua); color:#fff; width:100%; margin-top:18px}
+  .btn-utama:active{background:var(--hijau)}
+  .btn-kuning{background:var(--kuning); color:#422006}
+  .btn-abu{background:var(--abu2); color:var(--teks)}
+  .btn-kecil{padding:8px 14px; font-size:.9rem; width:auto; margin-top:0}
+  .btn:disabled{opacity:.5; cursor:not-allowed}
+  .error{background:#fef2f2; border:1px solid #fecaca; color:#991b1b; border-radius:10px; padding:10px 14px; margin-top:14px; display:none}
+  .info{background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; border-radius:10px; padding:10px 14px; margin-top:14px}
+  .warn{background:#fefce8; border:1px solid #fde68a; color:#854d0e; border-radius:10px; padding:10px 14px; margin-top:14px}
+  .hidden{display:none !important}
+  /* Bar atas saat ujian */
+  .topbar{position:sticky; top:0; z-index:20; background:#fff; border-radius:var(--radius); box-shadow:0 2px 10px rgba(0,0,0,.08);
+    padding:10px 14px; margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between}
+  .timer{font-weight:800; font-size:1.15rem; background:var(--hijau-tua); color:#fff; border-radius:10px; padding:6px 14px; font-variant-numeric:tabular-nums}
+  .timer.kritis{background:var(--merah); animation:kedip 1s infinite}
+  @keyframes kedip{50%{opacity:.65}}
+  .chip{background:var(--abu); border-radius:999px; padding:6px 12px; font-size:.85rem; font-weight:600}
+  .chip.tab{background:#fef2f2; color:#991b1b}
+  /* Soal */
+  .soal-meta{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px}
+  .tipe{font-size:.75rem; font-weight:800; letter-spacing:.04em; border-radius:999px; padding:3px 10px; text-transform:uppercase}
+  .tipe-pg{background:#dcfce7; color:#166534}.tipe-isian{background:#dbeafe; color:#1e40af}.tipe-uraian{background:#fae8ff; color:#86198f}
+  .indikator{font-size:.8rem; color:var(--teks-lembut)}
+  .pertanyaan{font-size:1.08rem; line-height:1.55; white-space:pre-line; margin:6px 0 16px}
+  .opsi{display:block; width:100%; text-align:left; margin:8px 0; padding:13px 14px; border:2px solid var(--abu2); border-radius:12px;
+    background:#fff; cursor:pointer; font-size:1rem; font-family:inherit}
+  .opsi:hover{border-color:var(--hijau-muda)}
+  .opsi.terpilih{border-color:var(--hijau-tua); background:#f0fdf4; font-weight:600}
+  .opsi .huruf{display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%;
+    background:var(--abu2); font-weight:800; margin-right:10px; font-size:.9rem}
+  .opsi.terpilih .huruf{background:var(--hijau-tua); color:#fff}
+  .nav-bawah{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
+  .nav-bawah .btn{flex:1; min-width:110px}
+  .ragu{display:flex; align-items:center; gap:8px; margin-top:14px; font-weight:600; cursor:pointer; user-select:none}
+  .ragu input{width:20px; height:20px; accent-color:#eab308}
+  /* Peta soal */
+  .peta{display:grid; grid-template-columns:repeat(10,1fr); gap:6px; margin-top:10px}
+  @media(max-width:560px){.peta{grid-template-columns:repeat(5,1fr)}}
+  .peta button{border:2px solid var(--abu2); background:#fff; border-radius:9px; padding:9px 0; font-weight:700; cursor:pointer; font-family:inherit; font-size:.95rem}
+  .peta button.terisi{background:var(--hijau-tua); color:#fff; border-color:var(--hijau-tua)}
+  .peta button.ditandai{background:var(--kuning); border-color:#eab308; color:#422006}
+  .peta button.terisi.ditandai{background:var(--kuning); color:#422006; border-color:var(--hijau-tua)}
+  .peta button.aktif{outline:3px solid var(--hijau-muda); outline-offset:1px}
+  .legenda{font-size:.8rem; color:var(--teks-lembut); margin-top:8px}
+  /* Hasil */
+  .skor{font-size:3.4rem; font-weight:900; text-align:center; color:var(--hijau-tua); margin:6px 0}
+  .status{text-align:center; font-size:1.25rem; font-weight:800}
+  .status.tuntas{color:var(--hijau)} .status.belum{color:var(--merah)}
+  table{width:100%; border-collapse:collapse; font-size:.9rem}
+  th,td{border:1px solid var(--abu2); padding:8px; text-align:left; vertical-align:top}
+  th{background:var(--hijau-tua); color:#fff}
+  .bar{height:10px; background:var(--abu2); border-radius:99px; overflow:hidden; min-width:90px}
+  .bar > div{height:100%; background:var(--hijau)}
+  .tabel-scroll{overflow-x:auto}
+  /* Modal */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:16px}
+  .modal.tampil{display:flex}
+  .modal .kotak{background:#fff; border-radius:16px; padding:22px; max-width:440px; width:100%}
+  .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:60; background:#991b1b; color:#fff;
+    padding:12px 18px; border-radius:12px; font-weight:700; display:none; max-width:92vw; text-align:center; box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  footer{text-align:center; color:var(--teks-lembut); font-size:.82rem; padding:20px 10px 30px}
+  a{color:var(--hijau-tua); font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>🎯 Asesmen Sumatif Lingkaran</h1>
+  <p>Matematika • SMP Kelas 9E</p>
+  <span class="badge">KKM 75 • 60 menit • 20 soal</span>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== HALAMAN MASUK ===================== -->
+  <section id="view-login" class="card">
+    <h2 style="margin-top:0">Masuk Ujian</h2>
+    <p style="color:var(--teks-lembut); margin-top:0">Isi token ujian dari guru dan identitasmu dengan benar. Jawaban tersimpan otomatis di perangkat ini — refresh tidak menghilangkan jawaban.</p>
+    <div id="backend-warn" class="warn hidden">⚠️ <b>Backend belum terhubung.</b> Guru belum mengisi <b>APPS_SCRIPT_URL</b> di file ini. Jawaban hanya tersimpan di perangkat dan nilai belum bisa dihitung. Ikuti PANDUAN_DEPLOY.md terlebih dahulu.</div>
+    <label for="in-token">Token Ujian</label>
+    <input type="text" id="in-token" placeholder="Contoh: SUMATIF9E" autocomplete="off" style="text-transform:uppercase">
+    <label for="in-nama">Nama Lengkap</label>
+    <input type="text" id="in-nama" placeholder="Nama sesuai absen" autocomplete="name">
+    <label for="in-nis">NIS</label>
+    <input type="text" id="in-nis" placeholder="Nomor Induk Siswa" inputmode="numeric" autocomplete="off">
+    <label for="in-kelas">Kelas</label>
+    <input type="text" id="in-kelas" value="9E" autocomplete="off">
+    <div id="login-error" class="error"></div>
+    <div id="login-info" class="info hidden"></div>
+    <button class="btn btn-utama" id="btn-mulai">Mulai / Lanjutkan Ujian →</button>
+    <p style="text-align:center; margin-top:16px; font-size:.9rem">Guru? <a href="?mode=guru">Buka Mode Guru</a></p>
+  </section>
+
+  <!-- ===================== HALAMAN UJIAN ===================== -->
+  <section id="view-exam" class="hidden">
+    <div class="topbar">
+      <span class="timer" id="timer">60:00</span>
+      <span class="chip" id="chip-nama">—</span>
+      <span class="chip" id="chip-progres">Soal 1 dari 20</span>
+      <span class="chip tab" id="chip-tab" title="Jumlah pindah tab/aplikasi selama ujian">🚫 Pindah tab: 0×</span>
+    </div>
+
+    <div class="card">
+      <div class="soal-meta">
+        <span class="tipe" id="soal-tipe">PG</span>
+        <span class="indikator" id="soal-indikator"></span>
+      </div>
+      <div class="pertanyaan" id="soal-teks"></div>
+      <div id="soal-jawaban"></div>
+      <label class="ragu"><input type="checkbox" id="cek-ragu"> Tandai ragu-ragu 🟡</label>
+      <div class="nav-bawah">
+        <button class="btn btn-abu" id="btn-prev">← Sebelumnya</button>
+        <button class="btn btn-abu" id="btn-next">Berikutnya →</button>
+        <button class="btn btn-kuning" id="btn-kumpul">✔ Kumpulkan</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <b>Peta Soal</b> <span style="color:var(--teks-lembut); font-size:.85rem">(ketuk nomor untuk loncat)</span>
+      <div class="peta" id="peta"></div>
+      <div class="legenda">⬜ belum dijawab • 🟩 sudah dijawab • 🟨 ragu-ragu • lingkaran hijau = soal yang sedang dibuka</div>
+    </div>
+  </section>
+
+  <!-- ===================== HALAMAN HASIL ===================== -->
+  <section id="view-result" class="card hidden">
+    <h2 style="margin-top:0; text-align:center">Hasil Ujian</h2>
+    <p style="text-align:center; color:var(--teks-lembut)" id="hasil-nama">—</p>
+    <div id="hasil-isi"></div>
+    <div id="hasil-catatan" class="info"></div>
+    <button class="btn btn-utama" id="btn-kirim-ulang" style="display:none">↻ Coba Kirim Ulang ke Server</button>
+  </section>
+
+  <!-- ===================== HALAMAN GURU ===================== -->
+  <section id="view-guru" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0">👩‍🏫 Mode Guru</h2>
+      <p style="color:var(--teks-lembut)">Rekap nilai &amp; analisis butir soal dibaca langsung dari Google Sheet. PIN diatur di satu konstanta <b>PIN_GURU</b> pada file Code.gs.</p>
+      <div id="guru-login">
+        <label for="in-pin">PIN Guru</label>
+        <input type="password" id="in-pin" placeholder="Masukkan PIN guru" autocomplete="off">
+        <div id="guru-error" class="error"></div>
+        <button class="btn btn-utama" id="btn-guru-masuk">Buka Rekap</button>
+        <p style="text-align:center; margin-top:14px; font-size:.9rem"><a href="./">← Kembali ke halaman peserta</a></p>
+      </div>
+      <div id="guru-isi" class="hidden">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px">
+          <button class="btn btn-kuning btn-kecil" id="btn-csv">⬇️ Unduh Rekap CSV</button>
+          <button class="btn btn-abu btn-kecil" id="btn-refresh-rekap">↻ Muat Ulang</button>
+          <span class="chip" id="guru-jumlah">0 peserta</span>
+        </div>
+        <h3>Rekap Peserta</h3>
+        <div class="tabel-scroll"><table id="tabel-rekap">
+          <thead><tr><th>No</th><th>Nama</th><th>NIS</th><th>Kelas</th><th>Token</th><th>Mulai</th><th>Selesai</th><th>Nilai</th><th>Status</th><th>Pindah Tab</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <h3 style="margin-top:26px">Analisis Butir Soal — % Jawaban Benar per Soal</h3>
+        <div class="tabel-scroll"><table id="tabel-analisis-soal">
+          <thead><tr><th>Soal</th><th>Tipe</th><th>Indikator (TP)</th><th>% Benar</th><th style="min-width:110px">Grafik</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <h3 style="margin-top:26px">Analisis per Indikator (TP)</h3>
+        <div class="tabel-scroll"><table id="tabel-analisis-tp">
+          <thead><tr><th>Indikator (TP)</th><th>% Benar Rata-rata</th><th style="min-width:110px">Grafik</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p style="font-size:.85rem; color:var(--teks-lembut)">Catatan: soal uraian dinilai semi-otomatis di server (angka kunci + kata kunci langkah). Guru dapat mengoreksi nilai uraian langsung di Google Sheet bila perlu.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal konfirmasi kumpul -->
+<div class="modal" id="modal-kumpul">
+  <div class="kotak">
+    <h3 style="margin-top:0">Kumpulkan Jawaban?</h3>
+    <p id="modal-teks"></p>
+    <p style="color:var(--teks-lembut); font-size:.9rem">Setelah dikumpulkan, jawaban tidak bisa diubah lagi.</p>
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-abu" id="btn-modal-batal" style="flex:1">Belum, Periksa Lagi</button>
+      <button class="btn btn-kuning" id="btn-modal-ya" style="flex:1">Ya, Kumpulkan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>Asesmen Sumatif Lingkaran • Matematika SMP Kelas 9E • KKM 75<br>Jawaban dinilai di server (Google Apps Script) dan tersimpan di Google Sheet guru.</footer>
+
+<script>
+'use strict';
+/* ============================================================
+   KONFIGURASI — GURU HANYA PERLU MENGUBAH BAGIAN INI
+   1) APPS_SCRIPT_URL : tempel URL Web App dari Google Apps Script
+      (hasil Deploy di PANDUAN_DEPLOY.md langkah 4). Kosong = backend
+      belum terhubung, nilai belum bisa dihitung.
+   2) TOKEN_UJIAN     : token yang dibagikan guru ke peserta.
+      WAJIB sama dengan TOKEN_UJIAN di Code.gs.
+   PIN guru TIDAK ditaruh di file ini — PIN diatur di Code.gs.
+   ============================================================ */
+const CONFIG = {
+  APPS_SCRIPT_URL: '',
+  TOKEN_UJIAN: 'SUMATIF9E',
+  NAMA_UJIAN: 'Asesmen Sumatif Lingkaran',
+  MAPEL: 'Matematika - SMP Kelas 9E',
+  KKM: 75,
+  DURASI_MENIT: 60
+};
+
+/* ============================================================
+   BANK SOAL (VERSI PUBLIK)
+   File ini SENGAJA tidak memuat kunci jawaban & pembahasan.
+   Kunci + pembahasan hanya ada di Code.gs (server) dan di
+   BANK_SOAL.json milik guru — jangan unggah keduanya ke GitHub.
+   Indikator = TP terkunci:
+   TP1 luas lingkaran | TP2 keliling lingkaran | TP3 luas juring
+   TP4 panjang busur | TP5 jari-jari dari luas | TP6 jari-jari dari keliling
+   ============================================================ */
+const BANK_SOAL = [
+  {id:1,  tipe:'pg', indikator:'Menentukan luas lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 7 cm. Jika π = 22/7, luas lingkaran tersebut adalah …',
+   opsi:['44 cm²','154 cm²','616 cm²','38,5 cm²']},
+  {id:2,  tipe:'pg', indikator:'Menentukan luas lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 10 cm. Jika π = 3,14, luas lingkaran tersebut adalah …',
+   opsi:['62,8 cm²','628 cm²','314 cm²','31,4 cm²']},
+  {id:3,  tipe:'pg', indikator:'Menentukan keliling lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 14 cm. Jika π = 22/7, keliling lingkaran tersebut adalah …',
+   opsi:['44 cm','154 cm','88 cm','616 cm']},
+  {id:4,  tipe:'pg', indikator:'Menentukan keliling lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai diameter 20 cm. Jika π = 3,14, keliling lingkaran tersebut adalah …',
+   opsi:['314 cm','62,8 cm','125,6 cm','31,4 cm']},
+  {id:5,  tipe:'pg', indikator:'Menentukan luas juring',
+   pertanyaan:'Sebuah juring lingkaran mempunyai sudut pusat 90° dan jari-jari 7 cm. Jika π = 22/7, luas juring tersebut adalah …',
+   opsi:['154 cm²','77 cm²','19,25 cm²','38,5 cm²']},
+  {id:6,  tipe:'pg', indikator:'Menentukan luas juring',
+   pertanyaan:'Luas sebuah lingkaran adalah 300 cm². Sebuah juring pada lingkaran itu mempunyai sudut pusat 120°. Luas juring tersebut adalah …',
+   opsi:['100 cm²','50 cm²','150 cm²','200 cm²']},
+  {id:7,  tipe:'pg', indikator:'Menentukan panjang busur',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 7 cm. Jika π = 22/7, panjang busur yang menghadap sudut pusat 90° adalah …',
+   opsi:['5,5 cm','22 cm','11 cm','44 cm']},
+  {id:8,  tipe:'pg', indikator:'Menentukan panjang busur',
+   pertanyaan:'Keliling sebuah lingkaran adalah 120 cm. Panjang busur yang menghadap sudut pusat 60° adalah …',
+   opsi:['30 cm','20 cm','60 cm','40 cm']},
+  {id:9,  tipe:'pg', indikator:'Menentukan jari-jari jika luasnya diketahui',
+   pertanyaan:'Luas sebuah lingkaran adalah 154 cm². Jika π = 22/7, jari-jari lingkaran tersebut adalah …',
+   opsi:['14 cm','7 cm','49 cm','21 cm']},
+  {id:10, tipe:'pg', indikator:'Menentukan jari-jari jika kelilingnya diketahui',
+   pertanyaan:'Keliling sebuah lingkaran adalah 62,8 cm. Jika π = 3,14, jari-jari lingkaran tersebut adalah …',
+   opsi:['5 cm','20 cm','10 cm','31,4 cm']},
+  {id:11, tipe:'isian', indikator:'Menentukan luas lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 5 cm. Jika π = 3,14, luas lingkaran tersebut adalah … cm².\n(Tulis angkanya saja, contoh: 78,5)'},
+  {id:12, tipe:'isian', indikator:'Menentukan keliling lingkaran',
+   pertanyaan:'Sebuah lingkaran mempunyai diameter 14 cm. Jika π = 22/7, keliling lingkaran tersebut adalah … cm.\n(Tulis angkanya saja, contoh: 44)'},
+  {id:13, tipe:'isian', indikator:'Menentukan luas juring',
+   pertanyaan:'Sebuah juring mempunyai sudut pusat 90° dan jari-jari 10 cm. Jika π = 3,14, luas juring tersebut adalah … cm².\n(Tulis angkanya saja, contoh: 78,5)'},
+  {id:14, tipe:'isian', indikator:'Menentukan jari-jari jika luasnya diketahui',
+   pertanyaan:'Luas sebuah lingkaran adalah 314 cm². Jika π = 3,14, jari-jari lingkaran tersebut adalah … cm.\n(Tulis angkanya saja, contoh: 10)'},
+  {id:15, tipe:'isian', indikator:'Menentukan jari-jari jika kelilingnya diketahui',
+   pertanyaan:'Keliling sebuah lingkaran adalah 88 cm. Jika π = 22/7, jari-jari lingkaran tersebut adalah … cm.\n(Tulis angkanya saja, contoh: 14)'},
+  {id:16, tipe:'uraian', indikator:'Menentukan luas lingkaran',
+   pertanyaan:'Sebuah taman berbentuk lingkaran mempunyai jari-jari 21 m. Jika π = 22/7, hitunglah luas taman tersebut!\nTuliskan: diketahui, rumus yang dipakai, langkah pengerjaan, dan jawaban akhir.'},
+  {id:17, tipe:'uraian', indikator:'Menentukan keliling lingkaran',
+   pertanyaan:'Sebuah roda sepeda mempunyai jari-jari 35 cm. Jika π = 22/7, hitunglah keliling roda tersebut!\nTuliskan: diketahui, rumus yang dipakai, langkah pengerjaan, dan jawaban akhir.'},
+  {id:18, tipe:'uraian', indikator:'Menentukan panjang busur',
+   pertanyaan:'Sebuah lingkaran mempunyai jari-jari 21 cm. Jika π = 22/7, hitunglah panjang busur yang menghadap sudut pusat 120°!\nTuliskan: diketahui, rumus yang dipakai, langkah pengerjaan, dan jawaban akhir.'},
+  {id:19, tipe:'uraian', indikator:'Menentukan jari-jari jika luasnya diketahui',
+   pertanyaan:'Luas sebuah lingkaran adalah 616 cm². Jika π = 22/7, tentukan jari-jari dan diameter lingkaran tersebut!\nTuliskan: diketahui, rumus yang dipakai, langkah pengerjaan, dan jawaban akhir.'},
+  {id:20, tipe:'uraian', indikator:'Menentukan jari-jari jika kelilingnya diketahui',
+   pertanyaan:'Keliling sebuah lingkaran adalah 125,6 cm. Jika π = 3,14, tentukan jari-jari dan luas lingkaran tersebut!\nTuliskan: diketahui, rumus yang dipakai, langkah pengerjaan, dan jawaban akhir.'}
+];
+const SOAL_BY_ID = {};
+BANK_SOAL.forEach(function(s){ SOAL_BY_ID[s.id] = s; });
+
+/* ---------- Util: hash & RNG ber-seed (urutan stabil saat refresh) ---------- */
+function cyrb53(str, seed){
+  seed = seed || 0;
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++){
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shuffled(arr, seedStr){
+  const rng = mulberry32(cyrb53(seedStr) % 2147483647);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function fmtWaktu(iso){
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  return d.toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+}
+</script>
+
+<script>
+'use strict';
+/* =================== STATE & AUTOSAVE =================== */
+const LS_PREFIX = 'CBT_LINGKARAN_V1_';
+let state = null;        // sesi aktif peserta
+let timerInt = null;
+let guruData = null;
+let guruPin = '';
+
+function lsKey(nis){ return LS_PREFIX + String(nis || '').trim().toUpperCase(); }
+function saveState(){
+  if (!state) return;
+  try { localStorage.setItem(lsKey(state.nis), JSON.stringify(state)); } catch(e){ /* penyimpanan penuh/diblokir: abaikan */ }
+}
+function loadState(nis){
+  try {
+    const raw = localStorage.getItem(lsKey(nis));
+    return raw ? JSON.parse(raw) : null;
+  } catch(e){ return null; }
+}
+function seedString(st){ return CONFIG.TOKEN_UJIAN + '|' + st.nis.toUpperCase() + '|' + st.nama.toLowerCase(); }
+function buatUrutan(st){
+  const seed = seedString(st);
+  st.order = shuffled(BANK_SOAL.map(function(s){ return s.id; }), seed + '|soal');
+  st.opsiOrder = {};
+  BANK_SOAL.forEach(function(s){
+    if (s.tipe === 'pg') st.opsiOrder[s.id] = shuffled(s.opsi.slice(), seed + '|opsi' + s.id);
+  });
+}
+function sesiBaru(nama, nis, kelas, token){
+  const st = {
+    nama: nama, nis: nis, kelas: kelas, token: token,
+    answers: {}, ragu: {}, currentIdx: 0, tabSwitch: 0,
+    startTime: new Date().toISOString(),
+    endTime: Date.now() + CONFIG.DURASI_MENIT * 60 * 1000,
+    submitted: false, submissionId: 'SUB-' + Date.now().toString(36).toUpperCase() + '-' + cyrb53(nis + nama).toString(36).toUpperCase(),
+    result: null, pendingPayload: null
+  };
+  buatUrutan(st);
+  return st;
+}
+function soalSaatIni(){ return SOAL_BY_ID[state.order[state.currentIdx]]; }
+function terjawab(st, id){
+  const v = st.answers[id];
+  return v !== undefined && String(v).trim() !== '';
+}
+
+/* =================== NAVIGASI VIEW =================== */
+function tampil(id){
+  ['view-login','view-exam','view-result','view-guru'].forEach(function(v){
+    document.getElementById(v).classList.toggle('hidden', v !== id);
+  });
+  window.scrollTo(0, 0);
+}
+function toast(pesan, ms){
+  const t = document.getElementById('toast');
+  t.textContent = pesan; t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, ms || 3500);
+}
+
+/* =================== LOGIN =================== */
+function onMulai(){
+  const err = document.getElementById('login-error');
+  const info = document.getElementById('login-info');
+  err.style.display = 'none'; info.classList.add('hidden');
+  const token = document.getElementById('in-token').value.trim().toUpperCase();
+  const nama  = document.getElementById('in-nama').value.trim();
+  const nis   = document.getElementById('in-nis').value.trim();
+  const kelas = document.getElementById('in-kelas').value.trim() || '9E';
+
+  if (token !== CONFIG.TOKEN_UJIAN){
+    err.textContent = '❌ Token ujian salah. Periksa kembali token dari guru, lalu coba lagi.';
+    err.style.display = 'block'; return;
+  }
+  if (nama.length < 3){ err.textContent = '❌ Nama belum diisi dengan benar.'; err.style.display = 'block'; return; }
+  if (nis.length < 3){ err.textContent = '❌ NIS belum diisi dengan benar.'; err.style.display = 'block'; return; }
+
+  const lama = loadState(nis);
+  if (lama && lama.submitted){
+    state = lama;
+    tampilHasil();
+    return;
+  }
+  if (lama && lama.token === token && lama.nama.toLowerCase() === nama.toLowerCase()){
+    state = lama; // lanjutkan sesi: jawaban, timer & urutan soal dipulihkan
+    info.textContent = '↩️ Sesi sebelumnya ditemukan — jawabanmu dipulihkan. Selamat melanjutkan!';
+    info.classList.remove('hidden');
+  } else {
+    state = sesiBaru(nama, nis, kelas, token);
+  }
+  state.kelas = kelas;
+  saveState();
+  mulaiUjian();
+}
+
+/* =================== UJIAN =================== */
+function mulaiUjian(){
+  tampil('view-exam');
+  document.getElementById('chip-nama').textContent = '👤 ' + state.nama + ' (' + state.nis + ')';
+  renderSoal();
+  updateChipTab();
+  clearInterval(timerInt);
+  timerInt = setInterval(tickTimer, 500);
+  tickTimer();
+}
+function tickTimer(){
+  if (!state || state.submitted){ clearInterval(timerInt); return; }
+  let sisa = Math.round((state.endTime - Date.now()) / 1000);
+  const el = document.getElementById('timer');
+  if (sisa <= 0){
+    el.textContent = '00:00';
+    clearInterval(timerInt);
+    toast('⏰ Waktu habis! Jawabanmu dikumpulkan otomatis.', 5000);
+    submitExam(true);
+    return;
+  }
+  const m = String(Math.floor(sisa / 60)).padStart(2, '0');
+  const d = String(sisa % 60).padStart(2, '0');
+  el.textContent = m + ':' + d;
+  el.classList.toggle('kritis', sisa <= 300);
+}
+function updateChipTab(){
+  document.getElementById('chip-tab').textContent = '🚫 Pindah tab: ' + state.tabSwitch + '×';
+}
+function renderSoal(){
+  const s = soalSaatIni();
+  document.getElementById('chip-progres').textContent = 'Soal ' + (state.currentIdx + 1) + ' dari ' + state.order.length;
+  const tipeEl = document.getElementById('soal-tipe');
+  tipeEl.textContent = s.tipe === 'pg' ? 'Pilihan Ganda' : (s.tipe === 'isian' ? 'Isian Singkat' : 'Uraian');
+  tipeEl.className = 'tipe tipe-' + s.tipe;
+  document.getElementById('soal-indikator').textContent = '🎯 ' + s.indikator;
+  document.getElementById('soal-teks').textContent = s.pertanyaan;
+
+  const box = document.getElementById('soal-jawaban');
+  box.innerHTML = '';
+  if (s.tipe === 'pg'){
+    const opsi = state.opsiOrder[s.id] || s.opsi;
+    const huruf = ['A','B','C','D'];
+    opsi.forEach(function(teks, i){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opsi' + (state.answers[s.id] === teks ? ' terpilih' : '');
+      b.innerHTML = '<span class="huruf">' + huruf[i] + '</span>' + escapeHtml(teks);
+      b.addEventListener('click', function(){
+        state.answers[s.id] = teks; saveState(); renderSoal();
+      });
+      box.appendChild(b);
+    });
+  } else if (s.tipe === 'isian'){
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.placeholder = 'Tulis jawabanmu di sini (angka saja)';
+    inp.value = state.answers[s.id] || '';
+    inp.addEventListener('input', function(){ state.answers[s.id] = inp.value; saveState(); renderPeta(); });
+    box.appendChild(inp);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.rows = 7; ta.placeholder = 'Tulis diketahui, rumus, langkah pengerjaan, dan jawaban akhir…';
+    ta.value = state.answers[s.id] || '';
+    ta.addEventListener('input', function(){ state.answers[s.id] = ta.value; saveState(); renderPeta(); });
+    box.appendChild(ta);
+  }
+  document.getElementById('cek-ragu').checked = !!state.ragu[s.id];
+  document.getElementById('btn-prev').disabled = state.currentIdx === 0;
+  document.getElementById('btn-next').disabled = state.currentIdx === state.order.length - 1;
+  renderPeta();
+}
+function renderPeta(){
+  const peta = document.getElementById('peta');
+  peta.innerHTML = '';
+  state.order.forEach(function(id, idx){
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = idx + 1;
+    if (terjawab(state, id)) b.classList.add('terisi');
+    if (state.ragu[id]) b.classList.add('ditandai');
+    if (idx === state.currentIdx) b.classList.add('aktif');
+    b.addEventListener('click', function(){ state.currentIdx = idx; saveState(); renderSoal(); });
+    peta.appendChild(b);
+  });
+}
+function hitungSisa(){
+  let kosong = 0, ragu = 0;
+  state.order.forEach(function(id){
+    if (!terjawab(state, id)) kosong++;
+    if (state.ragu[id]) ragu++;
+  });
+  return {kosong: kosong, ragu: ragu};
+}
+function mintaKumpul(){
+  const sisa = hitungSisa();
+  let teks = 'Yakin kumpulkan jawaban sekarang?';
+  if (sisa.kosong > 0) teks += '\nMasih ada ' + sisa.kosong + ' soal belum dijawab.';
+  if (sisa.ragu > 0) teks += '\nAda ' + sisa.ragu + ' soal bertanda ragu-ragu.';
+  if (sisa.kosong === 0 && sisa.ragu === 0) teks += '\nSemua soal sudah dijawab. Kerja bagus!';
+  document.getElementById('modal-teks').innerText = teks;
+  document.getElementById('modal-kumpul').classList.add('tampil');
+}
+
+/* =================== KIRIM & NILAI (BACKEND) =================== */
+function jsonp(url){
+  return new Promise(function(resolve, reject){
+    const cb = 'cb_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 1e6);
+    const sc = document.createElement('script');
+    let selesai = false;
+    const bersih = function(){
+      try { delete window[cb]; } catch(e){ window[cb] = undefined; }
+      if (sc.parentNode) sc.parentNode.removeChild(sc);
+    };
+    window[cb] = function(data){ if (!selesai){ selesai = true; bersih(); resolve(data); } };
+    sc.onerror = function(){ if (!selesai){ selesai = true; bersih(); reject(new Error('JSONP gagal')); } };
+    setTimeout(function(){ if (!selesai){ selesai = true; bersih(); reject(new Error('JSONP timeout')); } }, 20000);
+    sc.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + cb;
+    document.body.appendChild(sc);
+  });
+}
+function buildPayload(){
+  return {
+    action: 'submit',
+    submissionId: state.submissionId,
+    token: state.token, nama: state.nama, nis: state.nis, kelas: state.kelas,
+    waktuMulai: state.startTime, waktuSelesai: new Date().toISOString(),
+    pindahTab: state.tabSwitch,
+    jawaban: state.answers
+  };
+}
+async function submitExam(otomatis){
+  if (!state || state.submitted) return;
+  document.getElementById('modal-kumpul').classList.remove('tampil');
+  const payload = buildPayload();
+  state.pendingPayload = payload;
+  state.submitted = true;               // kunci sesi lebih dulu agar refresh tidak mengulang kirim
+  state.submitTime = payload.waktuSelesai;
+  saveState();
+  clearInterval(timerInt);
+  tampilHasil({memuat: true});
+
+  if (!CONFIG.APPS_SCRIPT_URL){
+    tampilHasil({belumTerhubung: true});
+    return;
+  }
+  try {
+    await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+  } catch(e){ /* no-cors: kegagalan jaringan ditangani lewat polling hasil di bawah */ }
+
+  // Ambil nilai yang dihitung server (Apps Script) lewat JSONP
+  for (let i = 0; i < 12; i++){
+    try {
+      const r = await jsonp(CONFIG.APPS_SCRIPT_URL + '?action=hasil&id=' + encodeURIComponent(state.submissionId));
+      if (r && r.ok && r.hasil){
+        state.result = r.hasil; state.pendingPayload = null; saveState();
+        tampilHasil({});
+        return;
+      }
+    } catch(e){ /* coba lagi */ }
+    await new Promise(function(res){ setTimeout(res, 2500); });
+  }
+  tampilHasil({menungguServer: true});
+}
+async function kirimUlang(){
+  if (!state || !state.pendingPayload || !CONFIG.APPS_SCRIPT_URL) return;
+  tampilHasil({memuat: true});
+  try {
+    await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(state.pendingPayload)
+    });
+  } catch(e){}
+  for (let i = 0; i < 12; i++){
+    try {
+      const r = await jsonp(CONFIG.APPS_SCRIPT_URL + '?action=hasil&id=' + encodeURIComponent(state.submissionId));
+      if (r && r.ok && r.hasil){
+        state.result = r.hasil; state.pendingPayload = null; saveState();
+        tampilHasil({});
+        return;
+      }
+    } catch(e){}
+    await new Promise(function(res){ setTimeout(res, 2500); });
+  }
+  tampilHasil({menungguServer: true});
+}
+
+/* =================== HASIL =================== */
+function tampilHasil(opsi){
+  opsi = opsi || {};
+  tampil('view-result');
+  document.getElementById('hasil-nama').textContent =
+    state.nama + ' • NIS ' + state.nis + ' • Kelas ' + state.kelas + ' • Pindah tab: ' + state.tabSwitch + '×';
+  const isi = document.getElementById('hasil-isi');
+  const cat = document.getElementById('hasil-catatan');
+  const btnUlang = document.getElementById('btn-kirim-ulang');
+  btnUlang.style.display = 'none';
+
+  if (opsi.memuat){
+    isi.innerHTML = '<p style="text-align:center; font-size:1.1rem">⏳ Mengirim jawaban &amp; menunggu nilai dari server…</p>';
+    cat.textContent = 'Jangan tutup halaman ini sebentar — nilai sedang dihitung di server guru.';
+    return;
+  }
+  if (opsi.belumTerhubung){
+    isi.innerHTML = '<div class="skor">—</div><p class="status belum">JAWABAN TERSIMPAN DI PERANGKAT</p>';
+    cat.innerHTML = '⚠️ <b>Backend belum terhubung</b> (APPS_SCRIPT_URL masih kosong), jadi nilai belum bisa dihitung dan jawaban belum masuk Sheet guru. Ini normal SEBELUM guru selesai deploy. Setelah guru mengisi URL Apps Script, buka kembali file ini lalu tekan tombol kirim ulang.';
+    btnUlang.style.display = 'none';
+    return;
+  }
+  if (opsi.menungguServer){
+    isi.innerHTML = '<div class="skor">⏳</div><p class="status">JAWABAN TERKIRIM — NILAI SEDANG DIPROSES</p>';
+    cat.textContent = 'Jawabanmu sudah dikirim ke server. Jika nilai belum muncul, tunggu 1 menit lalu tekan tombol di bawah, atau tanyakan ke guru (nilai juga tercatat di Google Sheet).';
+    btnUlang.style.display = 'block';
+    return;
+  }
+  if (state.result){
+    const r = state.result;
+    const nilai = Math.round(Number(r.nilai) * 10) / 10;
+    const tuntas = nilai >= CONFIG.KKM;
+    isi.innerHTML =
+      '<div class="skor">' + nilai + '</div>' +
+      '<p class="status ' + (tuntas ? 'tuntas' : 'belum') + '">' + (tuntas ? '✅ TUNTAS' : '❌ BELUM TUNTAS') + ' (KKM ' + CONFIG.KKM + ')</p>' +
+      '<table style="margin-top:14px"><tr><th>Bagian</th><th>Hasil</th></tr>' +
+      '<tr><td>Pilihan Ganda (10 soal)</td><td>Benar ' + r.benarPG + ' soal • ' + r.poinPG + ' poin</td></tr>' +
+      '<tr><td>Isian Singkat (5 soal)</td><td>Benar ' + r.benarIsian + ' soal • ' + r.poinIsian + ' poin</td></tr>' +
+      '<tr><td>Uraian (5 soal)</td><td>' + r.poinUraian + ' dari 40 poin (semi-otomatis, guru dapat mengoreksi di Sheet)</td></tr></table>';
+    cat.textContent = tuntas
+      ? 'Selamat! Kamu mencapai KKM. Nilai & jawabanmu sudah tercatat di Sheet guru.'
+      : 'Belum mencapai KKM 75. Jangan menyerah — pelajari lagi pembahasan bersama guru dan ikuti remedial bila dijadwalkan. Nilai & jawabanmu sudah tercatat di Sheet guru.';
+    return;
+  }
+  // Dipanggil dari login untuk sesi yang sudah terkumpul tapi belum ada hasil lokal
+  isi.innerHTML = '<p style="text-align:center">Kamu sudah mengumpulkan ujian ini dari perangkat ini.</p>';
+  cat.textContent = state.pendingPayload
+    ? 'Pengiriman sebelumnya belum terkonfirmasi server. Tekan tombol kirim ulang.'
+    : 'Nilai tercatat di Google Sheet guru.';
+  if (state.pendingPayload && CONFIG.APPS_SCRIPT_URL) btnUlang.style.display = 'block';
+}
+
+/* =================== MODE GURU =================== */
+async function guruMuat(){
+  const err = document.getElementById('guru-error');
+  err.style.display = 'none';
+  if (!CONFIG.APPS_SCRIPT_URL){
+    err.textContent = '❌ Backend belum terhubung: APPS_SCRIPT_URL masih kosong di index.html. Selesaikan deploy dulu (PANDUAN_DEPLOY.md).';
+    err.style.display = 'block'; return;
+  }
+  if (!guruPin){ err.textContent = '❌ PIN belum diisi.'; err.style.display = 'block'; return; }
+  try {
+    const r = await jsonp(CONFIG.APPS_SCRIPT_URL + '?action=rekap&pin=' + encodeURIComponent(guruPin));
+    if (!r || !r.ok){
+      err.textContent = '❌ ' + ((r && r.pesan) || 'PIN salah atau server tidak merespons.');
+      err.style.display = 'block'; return;
+    }
+    guruData = r;
+    document.getElementById('guru-login').classList.add('hidden');
+    document.getElementById('guru-isi').classList.remove('hidden');
+    renderRekap();
+  } catch(e){
+    err.textContent = '❌ Tidak bisa menghubungi server. Cek koneksi internet & URL Apps Script.';
+    err.style.display = 'block';
+  }
+}
+function renderRekap(){
+  const peserta = (guruData && guruData.peserta) || [];
+  document.getElementById('guru-jumlah').textContent = peserta.length + ' peserta terkumpul';
+  const tb = document.querySelector('#tabel-rekap tbody');
+  tb.innerHTML = '';
+  peserta.forEach(function(p, i){
+    const tr = document.createElement('tr');
+    const nilai = Math.round(Number(p.nilai) * 10) / 10;
+    tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + escapeHtml(p.nama) + '</td><td>' + escapeHtml(p.nis) + '</td><td>' +
+      escapeHtml(p.kelas) + '</td><td>' + escapeHtml(p.token) + '</td><td>' + fmtWaktu(p.waktuMulai) + '</td><td>' +
+      fmtWaktu(p.waktuSelesai) + '</td><td><b>' + nilai + '</b></td><td>' +
+      (nilai >= CONFIG.KKM ? '✅ Tuntas' : '❌ Belum') + '</td><td>' + (p.pindahTab || 0) + '×</td>';
+    tb.appendChild(tr);
+  });
+  if (!peserta.length) tb.innerHTML = '<tr><td colspan="10" style="text-align:center">Belum ada peserta yang mengumpulkan.</td></tr>';
+
+  const perSoal = (guruData.analisis && guruData.analisis.perSoal) || [];
+  const ta = document.querySelector('#tabel-analisis-soal tbody');
+  ta.innerHTML = '';
+  perSoal.forEach(function(a){
+    const tr = document.createElement('tr');
+    const pct = Math.round(a.persen);
+    tr.innerHTML = '<td>' + a.id + '</td><td>' + escapeHtml(a.tipe) + '</td><td>' + escapeHtml(a.indikator) + '</td><td>' +
+      pct + '%</td><td><div class="bar"><div style="width:' + pct + '%"></div></div></td>';
+    ta.appendChild(tr);
+  });
+  const perTP = (guruData.analisis && guruData.analisis.perIndikator) || [];
+  const tt = document.querySelector('#tabel-analisis-tp tbody');
+  tt.innerHTML = '';
+  perTP.forEach(function(a){
+    const tr = document.createElement('tr');
+    const pct = Math.round(a.persen);
+    tr.innerHTML = '<td>' + escapeHtml(a.indikator) + '</td><td>' + pct + '%</td><td><div class="bar"><div style="width:' + pct + '%"></div></div></td>';
+    tt.appendChild(tr);
+  });
+}
+function unduhCSV(){
+  if (!guruData || !guruData.peserta){ toast('Rekap belum dimuat.'); return; }
+  const head = ['No','Nama','NIS','Kelas','Token','Waktu Mulai','Waktu Selesai','Nilai','Status (KKM 75)','Pindah Tab','Benar PG','Benar Isian','Poin Uraian'];
+  const rows = guruData.peserta.map(function(p, i){
+    const nilai = Math.round(Number(p.nilai) * 10) / 10;
+    return [i + 1, p.nama, p.nis, p.kelas, p.token, p.waktuMulai, p.waktuSelesai, nilai,
+      nilai >= CONFIG.KKM ? 'TUNTAS' : 'BELUM TUNTAS', p.pindahTab || 0, p.benarPG, p.benarIsian, p.poinUraian];
+  });
+  const csv = [head].concat(rows).map(function(r){
+    return r.map(function(c){ return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"'; }).join(';');
+  }).join('\r\n');
+  const tgl = new Date();
+  const nama = 'Rekap_Asesmen_Sumatif_Lingkaran_' + tgl.getFullYear() + '-' +
+    String(tgl.getMonth() + 1).padStart(2, '0') + '-' + String(tgl.getDate()).padStart(2, '0') + '.csv';
+  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nama;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+
+/* =================== PINDAH TAB =================== */
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden && state && !state.submitted && !document.getElementById('view-exam').classList.contains('hidden')){
+    state.tabSwitch++;
+    saveState(); updateChipTab();
+    toast('⚠️ Peringatan: pindah tab/aplikasi tercatat! Total: ' + state.tabSwitch + '×', 4000);
+  }
+});
+window.addEventListener('beforeunload', function(e){
+  if (state && !state.submitted && !document.getElementById('view-exam').classList.contains('hidden')){
+    e.preventDefault(); e.returnValue = '';
+  }
+});
+
+/* =================== INIT =================== */
+document.addEventListener('DOMContentLoaded', function(){
+  const modeGuru = new URLSearchParams(location.search).get('mode') === 'guru';
+  if (!CONFIG.APPS_SCRIPT_URL){
+    document.getElementById('backend-warn').classList.remove('hidden');
+  }
+  if (modeGuru){
+    tampil('view-guru');
+  } else {
+    tampil('view-login');
+    try {
+      const terakhir = localStorage.getItem(LS_PREFIX + 'TERAKHIR');
+      if (terakhir){
+        const st = loadState(terakhir);
+        if (st){
+          document.getElementById('in-nama').value = st.nama || '';
+          document.getElementById('in-nis').value = st.nis || '';
+          document.getElementById('in-kelas').value = st.kelas || '9E';
+          document.getElementById('in-token').value = st.token || '';
+        }
+      }
+    } catch(e){}
+  }
+  document.getElementById('btn-mulai').addEventListener('click', function(){
+    const nis = document.getElementById('in-nis').value.trim();
+    try { if (nis) localStorage.setItem(LS_PREFIX + 'TERAKHIR', nis); } catch(e){}
+    onMulai();
+  });
+  document.getElementById('btn-prev').addEventListener('click', function(){
+    if (state.currentIdx > 0){ state.currentIdx--; saveState(); renderSoal(); }
+  });
+  document.getElementById('btn-next').addEventListener('click', function(){
+    if (state.currentIdx < state.order.length - 1){ state.currentIdx++; saveState(); renderSoal(); }
+  });
+  document.getElementById('cek-ragu').addEventListener('change', function(ev){
+    state.ragu[soalSaatIni().id] = ev.target.checked; saveState(); renderPeta();
+  });
+  document.getElementById('btn-kumpul').addEventListener('click', mintaKumpul);
+  document.getElementById('btn-modal-batal').addEventListener('click', function(){
+    document.getElementById('modal-kumpul').classList.remove('tampil');
+  });
+  document.getElementById('btn-modal-ya').addEventListener('click', function(){ submitExam(false); });
+  document.getElementById('btn-kirim-ulang').addEventListener('click', kirimUlang);
+  document.getElementById('btn-guru-masuk').addEventListener('click', function(){
+    guruPin = document.getElementById('in-pin').value;
+    guruMuat();
+  });
+  document.getElementById('btn-refresh-rekap').addEventListener('click', guruMuat);
+  document.getElementById('btn-csv').addEventListener('click', unduhCSV);
+});
+</script>
+</body>
+</html>
